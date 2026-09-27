@@ -1,0 +1,18 @@
+import { getAdminSession } from "@/lib/auth";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
+
+export async function AdminShell({ children }: { children: React.ReactNode }) {
+  const session = await getAdminSession();
+
+  return (
+    <div className="flex min-h-dvh bg-neutral-50 font-sans text-neutral-900 antialiased">
+      <AdminSidebar
+        userName={session?.user?.name ?? "Admin"}
+        userEmail={session?.user?.email ?? "admin@tracker.local"}
+      />
+      <div className="flex min-h-dvh min-w-0 flex-1 flex-col">
+        <main className="flex-1 overflow-auto p-8">{children}</main>
+      </div>
+    </div>
+  );
+}

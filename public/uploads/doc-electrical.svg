@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
+  <rect width="640" height="480" fill="#f8f8f8"/>
+  <rect x="40" y="40" width="560" height="400" rx="16" fill="#ffffff" stroke="#E30613" stroke-width="4"/>
+  <rect x="40" y="40" width="560" height="72" rx="16" fill="#E30613"/>
+  <rect x="40" y="80" width="560" height="32" fill="#E30613"/>
+  <text x="320" y="85" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="28" font-weight="700">Electrical</text>
+  <text x="320" y="230" text-anchor="middle" fill="#333333" font-family="Arial,sans-serif" font-size="22">Panel & wiring</text>
+  <text x="320" y="280" text-anchor="middle" fill="#888888" font-family="Arial,sans-serif" font-size="16">Dokumentasi Indah Tracker</text>
+  <circle cx="320" cy="360" r="36" fill="#E30613" opacity="0.15"/>
+  <circle cx="320" cy="360" r="18" fill="#E30613"/>
+</svg>

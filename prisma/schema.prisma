@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum AdminRole {
+  ADMIN
+  SUPERADMIN
+}
+
+enum ShipmentStatus {
+  CREATED
+  IN_PROGRESS
+  QUALITY_CHECK
+  READY_TO_SHIP
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum ProgressTaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Admin {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      AdminRole @default(ADMIN)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model WbsTemplate {
+  id            String  @id @default(uuid())
+  name          String
+  description   String? @db.Text
+  estimatedDays Int     @default(30)
+  active        Boolean @default(true)
+
+  items     WbsTemplateItem[]
+  shipments Shipment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WbsTemplateItem {
+  id         String      @id @default(uuid())
+  templateId String
+  template   WbsTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   WbsTemplateItem?  @relation("WbsTemplateTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children WbsTemplateItem[] @relation("WbsTemplateTree")
+
+  title          String
+  sortOrder      Int  @default(0)
+  estimatedHours Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([templateId])
+  @@index([parentId])
+}
+
+/// Job tracking (nomor untuk customer) — setara Order di PWA
+model Shipment {
+  id              String         @id @default(uuid())
+  trackingNumber  String         @unique
+  externalOrderId String?
+  orderNumber     String?
+  customerName    String?
+  companyName     String?
+  phone           String?
+  phoneLast4      String?
+  status          ShipmentStatus @default(CREATED)
+  progressPercent Decimal        @default(0) @db.Decimal(5, 2)
+  note            String?        @db.Text
+
+  wbsTemplateId    String?
+  wbsTemplate      WbsTemplate? @relation(fields: [wbsTemplateId], references: [id], onDelete: SetNull)
+  estimatedDays    Int?
+  estimatedEndDate DateTime?
+  deliveredAt      DateTime?
+
+  progressTasks ProgressTask[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderNumber])
+  @@index([externalOrderId])
+  @@index([status])
+  @@index([phoneLast4])
+  @@index([wbsTemplateId])
+}
+
+model ProgressTask {
+  id         String   @id @default(uuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   ProgressTask?  @relation("ProgressTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children ProgressTask[] @relation("ProgressTree")
+
+  title         String
+  sortOrder     Int                @default(0)
+  weightPercent Decimal            @db.Decimal(5, 2)
+  status        ProgressTaskStatus @default(NOT_STARTED)
+
+  estimatedDays  Int?
+  estimatedHours Int?
+  actualHours    Int?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  note        String? @db.Text
+
+  photos ProgressPhoto[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shipmentId])
+  @@index([parentId])
+  @@index([status])
+}
+
+model ProgressPhoto {
+  id        String       @id @default(uuid())
+  taskId    String
+  task      ProgressTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  url       String       @db.Text
+  caption   String?
+  createdAt DateTime     @default(now())
+
+  @@index([taskId])
+}
