@@ -36,6 +36,14 @@ yarn-error.log*
 .env.*.local
 !.env.example
 
+# uploaded documentation photos (keep folder)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# database backups (local / server)
+/backups/*
+!/backups/.gitkeep
+
 # vercel
 .vercel
 

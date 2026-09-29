@@ -8,7 +8,10 @@
     "start": "next start -p 3001",
     "lint": "eslint",
     "db:seed": "npx tsx prisma/seed.ts",
-    "db:migrate": "npx prisma migrate dev"
+    "db:migrate": "npx prisma migrate dev",
+    "db:backup": "npx tsx scripts/backup-db.ts",
+    "db:backup:sql": "npx tsx scripts/backup-db.ts --sql",
+    "cron:reminders": "npx tsx scripts/run-deadline-reminders.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -16,6 +19,7 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "@sentry/nextjs": "^11.1.0",
     "bcrypt": "^6.0.0",
     "clsx": "^2.1.1",
     "dotenv": "^18.0.4",
@@ -23,9 +27,11 @@
     "mariadb": "^3.5.4",
     "next": "16.2.11",
     "next-auth": "^4.24.15",
+    "nodemailer": "^7.0.13",
     "prisma": "^7.10.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "sharp": "^0.35.5",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
     "uuid": "^14.0.2",
@@ -35,6 +41,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.12",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",

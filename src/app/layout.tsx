@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
+import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,6 +21,21 @@ export const metadata: Metadata = {
     template: "%s · Indah Tracker",
   },
   description: "Lacak progress pesanan mesin Indah Mesin",
+  applicationName: "Indah Tracker",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Workshop",
+  },
+  icons: {
+    icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0091d5",
 };
 
 export default function RootLayout({
@@ -36,6 +52,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster position="top-right" richColors closeButton />
+          <PwaRegister />
         </Providers>
       </body>
     </html>

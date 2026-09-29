@@ -3,17 +3,24 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --track-red: #e30613;
-  --track-red-dark: #b8050f;
-  --track-red-soft: #fff1f2;
+  /* Indah Mesin brand (indahmesin.com) */
+  --brand-blue: #0091d5;
+  --brand-blue-dark: #0077b0;
+  --brand-blue-soft: #eef7fc;
+  --brand-yellow: #e7b416;
+  --brand-dark: #1a1a1a;
+  --brand-charcoal: #2a2a2a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-track-red: var(--track-red);
-  --color-track-red-dark: var(--track-red-dark);
-  --color-track-red-soft: var(--track-red-soft);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-dark: var(--brand-blue-dark);
+  --color-brand-blue-soft: var(--brand-blue-soft);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-charcoal: var(--brand-charcoal);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -22,4 +29,20 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Track publik — card hasil tracking selalu putih */
+.track-summary-card {
+  background-color: #ffffff !important;
+  border-color: #e5e5e5 !important;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  @page {
+    margin: 12mm;
+  }
 }

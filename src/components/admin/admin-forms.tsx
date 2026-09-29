@@ -2,7 +2,7 @@
 
 import { useState, useTransition, type ReactNode } from "react";
 import { toast } from "sonner";
-import { Pencil, Plus, LayoutTemplate, X } from "lucide-react";
+import { Pencil, Plus, LayoutTemplate, X, Trash2 } from "lucide-react";
 import type { ActionResult } from "@/lib/action-result";
 import { cn } from "@/lib/utils";
 
@@ -52,15 +52,19 @@ export function AdminActionForm({
 export function AdminDeleteButton({
   action,
   label = "Hapus",
+  iconOnly = false,
 }: {
   action: () => Promise<ActionResult>;
   label?: string;
+  iconOnly?: boolean;
 }) {
   const [pending, startTransition] = useTransition();
   return (
     <button
       type="button"
       disabled={pending}
+      title={label}
+      aria-label={label}
       onClick={() => {
         if (!confirm(`Yakin ${label.toLowerCase()}?`)) return;
         startTransition(async () => {
@@ -69,9 +73,13 @@ export function AdminDeleteButton({
           else toast.error(result.message, { className: toastClass });
         });
       }}
-      className="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+      className={
+        iconOnly
+          ? "inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-red-600 shadow-sm ring-1 ring-red-200 hover:bg-red-50 disabled:opacity-60"
+          : "rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+      }
     >
-      {pending ? "…" : label}
+      {pending ? "…" : iconOnly ? <Trash2 className="h-3.5 w-3.5" strokeWidth={2} /> : label}
     </button>
   );
 }
@@ -136,7 +144,6 @@ export function AdminCrudDialog({
             </div>
             <div
               onSubmitCapture={() => {
-                // close after successful submit via slight delay
                 setTimeout(() => setOpen(false), 400);
               }}
             >
@@ -249,6 +256,7 @@ export function AdminFileField({
 }) {
   const [url, setUrl] = useState(defaultUrl ?? "");
   const [uploading, setUploading] = useState(false);
+  const [lightbox, setLightbox] = useState(false);
 
   async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -277,7 +285,29 @@ export function AdminFileField({
     <div className="block text-sm md:col-span-2">
       <span className="font-medium text-neutral-700">{label}</span>
       <input type="hidden" name={name} value={url} />
-      <div className="mt-1 flex flex-wrap items-center gap-3">
+      <div className="mt-2 space-y-3">
+        {url ? (
+          <div className="relative inline-block">
+            <button
+              type="button"
+              onClick={() => setLightbox(true)}
+              className="overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50"
+              title="Preview gambar"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt="Preview" className="h-28 w-28 object-cover" />
+            </button>
+            <button
+              type="button"
+              title="Hapus gambar"
+              aria-label="Hapus gambar"
+              onClick={() => setUrl("")}
+              className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600 shadow-sm ring-1 ring-red-200 hover:bg-red-50"
+            >
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
+            </button>
+          </div>
+        ) : null}
         <input
           type="file"
           accept={accept}
@@ -286,11 +316,18 @@ export function AdminFileField({
           className="block w-full text-xs text-neutral-600 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white"
         />
         {uploading ? <span className="text-xs text-neutral-500">Mengunggah…</span> : null}
-        {url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Preview" className="h-16 w-16 rounded-lg object-cover" />
-        ) : null}
       </div>
+
+      {lightbox && url ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setLightbox(false)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={url} alt="Preview penuh" className="max-h-[85vh] max-w-full rounded-lg" />
+        </button>
+      ) : null}
     </div>
   );
 }

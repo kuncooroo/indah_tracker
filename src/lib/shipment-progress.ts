@@ -1,44 +1,135 @@
-import { Prisma, type ProgressTaskStatus } from "@prisma/client";
+import { Prisma, type ProgressTaskStatus, type ShipmentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import {
+  clampHours,
+  distributeWeights,
+  round2,
+} from "@/lib/wbs-weights";
 
-export const MAX_SUB_HOURS = 8;
+export {
+  MAX_SUB_HOURS,
+  WEIGHT_SUM_TOLERANCE,
+  clampHours,
+  round2,
+  distributeWeights,
+  validateParentWeights,
+  previewTemplateWeights,
+  type WeightCheck,
+  type TemplatePreviewParent,
+} from "@/lib/wbs-weights";
 
-export function clampHours(value: number | null | undefined): number | null {
-  if (value == null || !Number.isFinite(value)) return null;
-  return Math.min(MAX_SUB_HOURS, Math.max(0, Math.round(value)));
+/**
+ * Saran status dari progress WBS — tidak memaksa DELIVERED (itu keputusan logistics).
+ * Status "downstream" (READY_TO_SHIP+) tidak diturunkan otomatis.
+ */
+export function suggestShipmentStatusFromProgress(input: {
+  progressPercent: number;
+  currentStatus: ShipmentStatus | string;
+}): { suggested: ShipmentStatus | null; reason: string | null } {
+  const pct = Number(input.progressPercent);
+  const current = input.currentStatus;
+
+  if (current === "CANCELLED" || current === "DELIVERED") {
+    return { suggested: null, reason: null };
+  }
+
+  // Progress selesai → QC, jangan lompat ke DELIVERED
+  if (pct >= 100) {
+    if (current === "QUALITY_CHECK" || current === "READY_TO_SHIP" || current === "IN_TRANSIT") {
+      return { suggested: null, reason: null };
+    }
+    return {
+      suggested: "QUALITY_CHECK",
+      reason: "Progress WBS 100% — sarankan Quality check (bukan otomatis Terkirim).",
+    };
+  }
+
+  if (pct > 0) {
+    if (current === "CREATED") {
+      return {
+        suggested: "IN_PROGRESS",
+        reason: "Sudah ada progress — status masih Dibuat.",
+      };
+    }
+    if (
+      current === "QUALITY_CHECK" ||
+      current === "READY_TO_SHIP" ||
+      current === "IN_TRANSIT" ||
+      current === "IN_PROGRESS"
+    ) {
+      return { suggested: null, reason: null };
+    }
+  }
+
+  return { suggested: null, reason: null };
 }
 
-export function round2(n: number) {
-  return Math.round(n * 100) / 100;
-}
+/** Status yang boleh di-auto-bump ringan dari recalc (tanpa override manual downstream). */
+const AUTO_BUMPABLE: ReadonlySet<string> = new Set(["CREATED"]);
 
-export function distributeWeights(parentCount: number, childCounts: number[]) {
-  if (parentCount <= 0) return { parentWeights: [] as number[], childWeights: [] as number[][] };
-  const parentWeight = round2(100 / parentCount);
-  const parentWeights = Array.from({ length: parentCount }, (_, i) =>
-    i === parentCount - 1 ? round2(100 - parentWeight * (parentCount - 1)) : parentWeight
-  );
-  const childWeights = parentWeights.map((pw, i) => {
-    const n = childCounts[i] ?? 0;
-    if (n <= 0) return [] as number[];
-    const each = round2(pw / n);
-    return Array.from({ length: n }, (_, j) =>
-      j === n - 1 ? round2(pw - each * (n - 1)) : each
-    );
+/** Redistribute parent/child weightPercent evenly after manual add/remove. */
+export async function rebalanceShipmentWeights(shipmentId: string) {
+  const parents = await prisma.progressTask.findMany({
+    where: { shipmentId, parentId: null },
+    orderBy: { sortOrder: "asc" },
+    include: {
+      children: { orderBy: { sortOrder: "asc" }, select: { id: true } },
+    },
   });
-  return { parentWeights, childWeights };
+
+  if (parents.length === 0) return;
+
+  const childCounts = parents.map((p) => p.children.length);
+  const { parentWeights, childWeights } = distributeWeights(parents.length, childCounts);
+
+  await prisma.$transaction(async (tx) => {
+    for (let i = 0; i < parents.length; i++) {
+      const parent = parents[i];
+      await tx.progressTask.update({
+        where: { id: parent.id },
+        data: { weightPercent: parentWeights[i] ?? 0 },
+      });
+      const weights = childWeights[i] ?? [];
+      for (let j = 0; j < parent.children.length; j++) {
+        await tx.progressTask.update({
+          where: { id: parent.children[j].id },
+          data: { weightPercent: weights[j] ?? 0 },
+        });
+      }
+    }
+  });
 }
 
 export async function recalculateShipmentProgress(shipmentId: string) {
-  const tasks = await prisma.progressTask.findMany({
-    where: { shipmentId },
-    select: {
-      id: true,
-      parentId: true,
-      status: true,
-      weightPercent: true,
-    },
-  });
+  const [tasks, shipment] = await Promise.all([
+    prisma.progressTask.findMany({
+      where: { shipmentId },
+      select: {
+        id: true,
+        parentId: true,
+        status: true,
+        weightPercent: true,
+      },
+    }),
+    prisma.shipment.findUnique({
+      where: { id: shipmentId },
+      select: {
+        id: true,
+        status: true,
+        progressPercent: true,
+        trackingNumber: true,
+        externalOrderId: true,
+        orderNumber: true,
+        customerName: true,
+        companyName: true,
+        phoneLast4: true,
+      },
+    }),
+  ]);
+
+  if (!shipment) {
+    return new Prisma.Decimal(0);
+  }
 
   const parentIds = new Set(tasks.filter((t) => !t.parentId).map((t) => t.id));
   const childrenByParent = new Map<string, typeof tasks>();
@@ -92,25 +183,33 @@ export async function recalculateShipmentProgress(shipmentId: string) {
     }
   }
 
-  const shipmentStatus =
-    Number(progressPercent) >= 100
-      ? ("DELIVERED" as const)
-      : Number(progressPercent) > 0
-        ? ("IN_PROGRESS" as const)
-        : undefined;
+  // Auto-status: hanya bump ringan CREATED → IN_PROGRESS.
+  let nextShipmentStatus: ShipmentStatus | undefined;
+  const current = shipment.status;
+  if (current && AUTO_BUMPABLE.has(current) && Number(progressPercent) > 0) {
+    nextShipmentStatus = "IN_PROGRESS";
+  }
 
-  await prisma.shipment.update({
+  const prevProgress = Number(shipment.progressPercent);
+  const progressChanged = Math.abs(prevProgress - Number(progressPercent)) >= 0.01;
+  const statusChanged = Boolean(nextShipmentStatus && nextShipmentStatus !== current);
+
+  const updated = await prisma.shipment.update({
     where: { id: shipmentId },
     data: {
       progressPercent,
-      ...(shipmentStatus
-        ? {
-            status: shipmentStatus,
-            deliveredAt: shipmentStatus === "DELIVERED" ? new Date() : null,
-          }
-        : {}),
+      ...(nextShipmentStatus ? { status: nextShipmentStatus } : {}),
     },
   });
+
+  if (statusChanged || progressChanged) {
+    const { dispatchWebhook } = await import("@/lib/webhook");
+    if (statusChanged) {
+      void dispatchWebhook("shipment.status_changed", updated);
+    } else {
+      void dispatchWebhook("shipment.progress_updated", updated);
+    }
+  }
 
   return progressPercent;
 }

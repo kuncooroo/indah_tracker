@@ -1,17 +1,36 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
+  applySuggestedShipmentStatus,
   applyTemplateToShipment,
+  bulkUpdateProgressTasks,
   clearShipmentProgress,
+  createManualProgressChild,
+  createManualProgressParent,
   deleteProgressPhoto,
+  deleteProgressTask,
+  rebalanceProgressWeights,
   updateProgressTask,
 } from "@/lib/admin-wbs-actions";
 import { prisma } from "@/lib/prisma";
+import {
+  suggestShipmentStatusFromProgress,
+  validateParentWeights,
+} from "@/lib/shipment-progress";
+import { SHIPMENT_STATUS_LABEL } from "@/lib/tracking";
 import { AdminDeleteButton } from "@/components/admin/admin-forms";
 import {
   ApplyWbsTemplateDialog,
+  ManualProgressChildDialog,
+  ManualProgressParentDialog,
   ProgressTaskUpdateDialog,
 } from "@/components/admin/admin-wbs-crud";
+import { ProgressPhotoPreview } from "@/components/admin/progress-photo-preview";
+import { ProgressBulkChecklist } from "@/components/admin/progress-bulk-checklist";
+import {
+  ProgressStatusSuggestBanner,
+  ProgressWeightBanner,
+} from "@/components/admin/progress-wbs-banners";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -49,12 +68,59 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
     prisma.wbsTemplate.findMany({
       where: { active: true },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, estimatedDays: true },
+      select: {
+        id: true,
+        name: true,
+        estimatedDays: true,
+        items: {
+          where: { parentId: null },
+          orderBy: { sortOrder: "asc" },
+          select: {
+            title: true,
+            children: {
+              orderBy: { sortOrder: "asc" },
+              select: { title: true, estimatedHours: true },
+            },
+          },
+        },
+      },
     }),
   ]);
 
   if (!shipment) redirect("/admin/shipments");
   const progress = Number(shipment.progressPercent);
+  const weightCheck = validateParentWeights(
+    shipment.progressTasks.map((p) => p.weightPercent)
+  );
+  const statusSuggest = suggestShipmentStatusFromProgress({
+    progressPercent: progress,
+    currentStatus: shipment.status,
+  });
+
+  const checklistItems = shipment.progressTasks.flatMap((parent) => {
+    if (parent.children.length === 0) {
+      return [
+        {
+          id: parent.id,
+          title: parent.title,
+          status: parent.status,
+          parentTitle: null as string | null,
+          estimatedHours: parent.estimatedHours,
+          actualHours: parent.actualHours,
+          isChild: false,
+        },
+      ];
+    }
+    return parent.children.map((child) => ({
+      id: child.id,
+      title: child.title,
+      status: child.status,
+      parentTitle: parent.title,
+      estimatedHours: child.estimatedHours,
+      actualHours: child.actualHours,
+      isChild: true,
+    }));
+  });
 
   return (
     <div className="space-y-6">
@@ -64,6 +130,12 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
           className="rounded-md border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
         >
           ← Detail shipment
+        </Link>
+        <Link
+          href={`/admin/shipments/${shipment.id}/report`}
+          className="rounded-md border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
+        >
+          Laporan PDF
         </Link>
         <Link
           href={`/track?code=${encodeURIComponent(shipment.trackingNumber)}${
@@ -81,6 +153,8 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
         </h1>
         <p className="mt-1 text-sm text-neutral-500">
           {[shipment.companyName, shipment.customerName].filter(Boolean).join(" · ") || "—"}
+          {" · "}
+          {SHIPMENT_STATUS_LABEL[shipment.status] ?? shipment.status}
         </p>
       </div>
 
@@ -98,7 +172,11 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
                 : ""}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <ManualProgressParentDialog
+              shipmentId={shipment.id}
+              createAction={createManualProgressParent}
+            />
             {shipment.progressTasks.length === 0 && templates.length > 0 ? (
               <ApplyWbsTemplateDialog
                 shipmentId={shipment.id}
@@ -125,19 +203,50 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
         </div>
       </div>
 
+      {shipment.progressTasks.length > 0 ? (
+        <div className="space-y-3">
+          <ProgressWeightBanner
+            sum={weightCheck.sum}
+            ok={weightCheck.ok}
+            shipmentId={shipment.id}
+            rebalanceAction={rebalanceProgressWeights}
+          />
+          {statusSuggest.suggested && statusSuggest.reason ? (
+            <ProgressStatusSuggestBanner
+              shipmentId={shipment.id}
+              currentLabel={SHIPMENT_STATUS_LABEL[shipment.status] ?? shipment.status}
+              suggestedLabel={
+                SHIPMENT_STATUS_LABEL[statusSuggest.suggested] ?? statusSuggest.suggested
+              }
+              reason={statusSuggest.reason}
+              applyAction={applySuggestedShipmentStatus}
+            />
+          ) : null}
+          <ProgressBulkChecklist
+            shipmentId={shipment.id}
+            items={checklistItems}
+            bulkAction={bulkUpdateProgressTasks}
+          />
+        </div>
+      ) : null}
+
       {shipment.progressTasks.length === 0 ? (
         <div className="rounded-xl border border-dashed border-neutral-200 bg-white p-10 text-center text-sm text-neutral-500">
-          {templates.length === 0 ? (
-            <>
-              Belum ada template WBS.{" "}
-              <Link href="/admin/wbs-templates" className="font-medium text-neutral-900 underline">
-                Buat template dulu
-              </Link>
-              .
-            </>
-          ) : (
-            "Apply template WBS untuk mulai tracking progress."
-          )}
+          <p>Belum ada fase progress.</p>
+          <p className="mt-1">
+            Tambah fase secara manual, atau{" "}
+            {templates.length > 0 ? (
+              "apply template WBS"
+            ) : (
+              <>
+                <Link href="/admin/wbs-templates" className="font-medium text-neutral-900 underline">
+                  buat template WBS
+                </Link>{" "}
+                dulu
+              </>
+            )}
+            .
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -175,6 +284,12 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
                     >
                       {statusLabel(parent.status)}
                     </span>
+                    <ManualProgressChildDialog
+                      shipmentId={shipment.id}
+                      parentId={parent.id}
+                      parentTitle={parent.title}
+                      createAction={createManualProgressChild}
+                    />
                     <ProgressTaskUpdateDialog
                       row={{
                         id: parent.id,
@@ -184,8 +299,17 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
                         estimatedHours: parent.estimatedHours,
                         note: parent.note,
                         parentId: parent.parentId,
+                        hasChildren: parent.children.length > 0,
                       }}
                       updateAction={updateProgressTask}
+                    />
+                    <AdminDeleteButton
+                      iconOnly
+                      label="Hapus fase"
+                      action={async () => {
+                        "use server";
+                        return deleteProgressTask(parent.id);
+                      }}
                     />
                   </div>
                 </div>
@@ -193,7 +317,7 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
                 <ul className="divide-y divide-neutral-100">
                   {parent.children.length === 0 ? (
                     <li className="px-5 py-4 text-sm text-neutral-400">
-                      Tidak ada sub-tugas (fase ini adalah leaf).
+                      Belum ada sub-tugas. Tambah sub-tugas manual, atau update status fase langsung.
                     </li>
                   ) : (
                     parent.children.map((child) => (
@@ -230,27 +354,28 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
                               }}
                               updateAction={updateProgressTask}
                             />
+                            <AdminDeleteButton
+                              iconOnly
+                              label="Hapus sub-tugas"
+                              action={async () => {
+                                "use server";
+                                return deleteProgressTask(child.id);
+                              }}
+                            />
                           </div>
                         </div>
                         {child.photos.length > 0 ? (
                           <div className="mt-3 flex flex-wrap gap-2">
                             {child.photos.map((photo) => (
-                              <div key={photo.id} className="relative">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={photo.url}
-                                  alt={photo.caption ?? child.title}
-                                  className="h-16 w-16 rounded-lg object-cover"
-                                />
-                                <div className="absolute -right-1 -top-1">
-                                  <AdminDeleteButton
-                                    action={async () => {
-                                      "use server";
-                                      return deleteProgressPhoto(photo.id);
-                                    }}
-                                  />
-                                </div>
-                              </div>
+                              <ProgressPhotoPreview
+                                key={photo.id}
+                                url={photo.url}
+                                caption={photo.caption}
+                                deleteAction={async () => {
+                                  "use server";
+                                  return deleteProgressPhoto(photo.id);
+                                }}
+                              />
                             ))}
                           </div>
                         ) : null}

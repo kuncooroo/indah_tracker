@@ -33,8 +33,13 @@ model Admin {
   email     String    @unique
   password  String
   role      AdminRole @default(ADMIN)
+  active    Boolean   @default(true)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([role])
+  @@index([active])
 }
 
 model WbsTemplate {
@@ -75,7 +80,7 @@ model WbsTemplateItem {
 model Shipment {
   id              String         @id @default(uuid())
   trackingNumber  String         @unique
-  externalOrderId String?
+  externalOrderId String? @unique
   orderNumber     String?
   customerName    String?
   companyName     String?
@@ -92,15 +97,24 @@ model Shipment {
   deliveredAt      DateTime?
 
   progressTasks ProgressTask[]
+  deadlineNotifications DeadlineNotificationLog[]
+  activityLogs ActivityLog[]
+
+  /// Soft-delete / arsip — null = aktif di list & track publik
+  deletedAt DateTime?
+  deletedBy String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([orderNumber])
-  @@index([externalOrderId])
   @@index([status])
   @@index([phoneLast4])
   @@index([wbsTemplateId])
+  @@index([deletedAt])
+  @@index([deletedAt, createdAt])
+  @@index([deletedAt, status])
+  @@index([status, estimatedEndDate])
 }
 
 model ProgressTask {
@@ -133,6 +147,8 @@ model ProgressTask {
   @@index([shipmentId])
   @@index([parentId])
   @@index([status])
+  @@index([shipmentId, status])
+  @@index([shipmentId, parentId])
 }
 
 model ProgressPhoto {
@@ -144,4 +160,52 @@ model ProgressPhoto {
   createdAt DateTime     @default(now())
 
   @@index([taskId])
+}
+
+/// Key-value settings (mis. REMINDER_SOON_DAYS)
+model AppSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+/// Anti-spam: maks 1 notifikasi per shipment per channel per hari (WIB)
+model DeadlineNotificationLog {
+  id         String   @id @default(uuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  kind       String // overdue | due_soon
+  channel    String // email | telegram
+  dayKey     String // YYYY-MM-DD (Asia/Jakarta)
+  createdAt  DateTime @default(now())
+
+  @@unique([shipmentId, channel, dayKey])
+  @@index([dayKey])
+  @@index([shipmentId])
+}
+
+/// Jejak perubahan (audit) per shipment
+model ActivityLog {
+  id         String   @id @default(uuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  action     String // SHIPMENT_CREATED | STATUS_CHANGED | TASK_UPDATED | ...
+  summary    String // ringkas untuk admin
+  publicText String? // versi aman untuk track publik (null = jangan tampil publik)
+
+  actorType  String // admin | api | system
+  actorId    String?
+  actorName  String?
+  actorEmail String?
+
+  beforeJson String? @db.Text
+  afterJson  String? @db.Text
+  metaJson   String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([shipmentId, createdAt])
+  @@index([action])
+  @@index([createdAt])
 }

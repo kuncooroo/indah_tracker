@@ -25,6 +25,9 @@ export async function runAdminAction(
   } catch (error) {
     const message = error instanceof Error ? error.message : "Terjadi kesalahan.";
     if (message === "Unauthorized") return fail("Anda harus login sebagai admin.");
+    if (message === "Forbidden") {
+      return fail("Akses ditolak — fitur ini hanya untuk SUPERADMIN.");
+    }
     return fail(message);
   }
 }

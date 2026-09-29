@@ -3,12 +3,17 @@ import {
   createWbsTemplate,
   updateWbsTemplate,
   deleteWbsTemplate,
+  duplicateWbsTemplate,
 } from "@/lib/admin-wbs-actions";
 import { prisma } from "@/lib/prisma";
+import { getAdminSession, isSuperAdmin } from "@/lib/auth";
 import { AdminDeleteButton } from "@/components/admin/admin-forms";
 import { WbsTemplateCreateDialog, WbsTemplateEditDialog } from "@/components/admin/admin-wbs-crud";
+import { DuplicateWbsTemplateButton } from "@/components/admin/duplicate-wbs-template-button";
 
 export default async function WbsTemplatesPage() {
+  const session = await getAdminSession();
+  const superAdmin = isSuperAdmin(session);
   const rows = await prisma.wbsTemplate.findMany({
     orderBy: { name: "asc" },
     include: { _count: { select: { items: true, shipments: true } } },
@@ -21,12 +26,13 @@ export default async function WbsTemplatesPage() {
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Template WBS</h1>
           <p className="mt-1 text-sm text-neutral-500">
             Template fase produksi — diterapkan ke shipment untuk tracking progress.
+            {!superAdmin ? " Hapus template hanya SUPERADMIN." : ""}
           </p>
         </div>
         <WbsTemplateCreateDialog createAction={createWbsTemplate} />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-neutral-200 bg-white">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-neutral-100 bg-neutral-50/80 text-neutral-500">
             <tr>
@@ -70,13 +76,19 @@ export default async function WbsTemplatesPage() {
                     >
                       Detail
                     </Link>
-                    <WbsTemplateEditDialog row={row} updateAction={updateWbsTemplate} />
-                    <AdminDeleteButton
-                      action={async () => {
-                        "use server";
-                        return deleteWbsTemplate(row.id);
-                      }}
+                    <DuplicateWbsTemplateButton
+                      templateId={row.id}
+                      duplicateAction={duplicateWbsTemplate}
                     />
+                    <WbsTemplateEditDialog row={row} updateAction={updateWbsTemplate} />
+                    {superAdmin ? (
+                      <AdminDeleteButton
+                        action={async () => {
+                          "use server";
+                          return deleteWbsTemplate(row.id);
+                        }}
+                      />
+                    ) : null}
                   </div>
                 </td>
               </tr>

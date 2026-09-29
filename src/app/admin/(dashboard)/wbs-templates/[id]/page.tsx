@@ -4,13 +4,16 @@ import {
   createWbsTemplateItem,
   updateWbsTemplateItem,
   deleteWbsTemplateItem,
+  duplicateWbsTemplate,
 } from "@/lib/admin-wbs-actions";
 import { prisma } from "@/lib/prisma";
+import { distributeWeights, validateParentWeights } from "@/lib/wbs-weights";
 import { AdminDeleteButton } from "@/components/admin/admin-forms";
 import {
   WbsTemplateItemCreateDialog,
   WbsTemplateItemEditDialog,
 } from "@/components/admin/admin-wbs-crud";
+import { DuplicateWbsTemplateButton } from "@/components/admin/duplicate-wbs-template-button";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -28,6 +31,10 @@ export default async function WbsTemplateDetailPage({ params }: PageProps) {
   });
   if (!template) notFound();
 
+  const childCounts = template.items.map((p) => p.children.length);
+  const { parentWeights } = distributeWeights(template.items.length, childCounts);
+  const weightCheck = validateParentWeights(parentWeights);
+
   return (
     <div className="space-y-6">
       <div>
@@ -40,9 +47,19 @@ export default async function WbsTemplateDetailPage({ params }: PageProps) {
             <p className="mt-1 text-sm text-neutral-500">
               Estimasi {template.estimatedDays} hari
               {template.description ? ` · ${template.description}` : ""}
+              {template.items.length > 0
+                ? ` · preview Σ bobot ${weightCheck.sum}%`
+                : ""}
             </p>
           </div>
-          <WbsTemplateItemCreateDialog templateId={template.id} createAction={createWbsTemplateItem} />
+          <div className="flex items-center gap-2">
+            <DuplicateWbsTemplateButton
+              templateId={template.id}
+              duplicateAction={duplicateWbsTemplate}
+              redirectToCopy
+            />
+            <WbsTemplateItemCreateDialog templateId={template.id} createAction={createWbsTemplateItem} />
+          </div>
         </div>
       </div>
 
@@ -57,7 +74,7 @@ export default async function WbsTemplateDetailPage({ params }: PageProps) {
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 bg-neutral-50/80 px-5 py-3">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-                    Fase {idx + 1}
+                    Fase {idx + 1} · bobot apply ~{parentWeights[idx] ?? 0}%
                   </p>
                   <h3 className="font-semibold text-neutral-900">{parent.title}</h3>
                 </div>
