@@ -1,10 +1,13 @@
-﻿name: Indah Tracker CI
+
+name: Indah Tracker CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -29,7 +32,7 @@ jobs:
 
       - name: Build Next.js
         run: npm run build
-	env:
-          DATABASE_URL: "mysql://ci_user:ci_password@   	127.0.0.1:3306/indah_tracker_ci"
+        env:
+          DATABASE_URL: "mysql://ci_user:ci_password@127.0.0.1:3306/indah_tracker_ci"
           NEXTAUTH_SECRET: "ci-only-placeholder-secret-for-build"
           AUTH_SECRET: "ci-only-placeholder-secret-for-build"
