@@ -40,6 +40,7 @@ model Admin {
 
   @@index([role])
   @@index([active])
+  @@map("admin")
 }
 
 model WbsTemplate {
@@ -54,6 +55,8 @@ model WbsTemplate {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("wbstemplate")
 }
 
 model WbsTemplateItem {
@@ -74,13 +77,14 @@ model WbsTemplateItem {
 
   @@index([templateId])
   @@index([parentId])
+  @@map("wbstemplateitem")
 }
 
 /// Job tracking (nomor untuk customer) — setara Order di PWA
 model Shipment {
   id              String         @id @default(uuid())
   trackingNumber  String         @unique
-  externalOrderId String? @unique
+  externalOrderId String?        @unique
   orderNumber     String?
   customerName    String?
   companyName     String?
@@ -96,9 +100,9 @@ model Shipment {
   estimatedEndDate DateTime?
   deliveredAt      DateTime?
 
-  progressTasks ProgressTask[]
+  progressTasks         ProgressTask[]
   deadlineNotifications DeadlineNotificationLog[]
-  activityLogs ActivityLog[]
+  activityLogs          ActivityLog[]
 
   /// Soft-delete / arsip — null = aktif di list & track publik
   deletedAt DateTime?
@@ -115,6 +119,7 @@ model Shipment {
   @@index([deletedAt, createdAt])
   @@index([deletedAt, status])
   @@index([status, estimatedEndDate])
+  @@map("shipment")
 }
 
 model ProgressTask {
@@ -149,6 +154,7 @@ model ProgressTask {
   @@index([status])
   @@index([shipmentId, status])
   @@index([shipmentId, parentId])
+  @@map("progresstask")
 }
 
 model ProgressPhoto {
@@ -160,6 +166,7 @@ model ProgressPhoto {
   createdAt DateTime     @default(now())
 
   @@index([taskId])
+  @@map("progressphoto")
 }
 
 /// Key-value settings (mis. REMINDER_SOON_DAYS)
@@ -167,6 +174,8 @@ model AppSetting {
   key       String   @id
   value     String   @db.Text
   updatedAt DateTime @updatedAt
+
+  @@map("appsetting")
 }
 
 /// Anti-spam: maks 1 notifikasi per shipment per channel per hari (WIB)
@@ -182,6 +191,7 @@ model DeadlineNotificationLog {
   @@unique([shipmentId, channel, dayKey])
   @@index([dayKey])
   @@index([shipmentId])
+  @@map("deadlinenotificationlog")
 }
 
 /// Jejak perubahan (audit) per shipment
@@ -208,4 +218,5 @@ model ActivityLog {
   @@index([shipmentId, createdAt])
   @@index([action])
   @@index([createdAt])
+  @@map("activitylog")
 }
