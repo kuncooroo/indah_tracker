@@ -4,6 +4,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { getAuthSecret, isProduction } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
@@ -91,6 +92,18 @@ export function sessionRole(session: Session | null): AdminRole | null {
 
 export function isSuperAdmin(session: Session | null) {
   return sessionRole(session) === "SUPERADMIN";
+}
+
+export async function redirectUnlessAdmin() {
+  try {
+    return await requireAdmin();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message === "Unauthorized" || message === "Forbidden") {
+      redirect("/admin/login");
+    }
+    throw error;
+  }
 }
 
 export async function requireAdmin() {

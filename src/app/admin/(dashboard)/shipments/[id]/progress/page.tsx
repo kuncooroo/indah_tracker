@@ -12,6 +12,7 @@ import {
   rebalanceProgressWeights,
   updateProgressTask,
 } from "@/lib/admin-wbs-actions";
+import { redirectUnlessAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   suggestShipmentStatusFromProgress,
@@ -47,6 +48,7 @@ function statusClass(status: string) {
 }
 
 export default async function ShipmentProgressPage({ params }: PageProps) {
+  await redirectUnlessAdmin();
   const { id } = await params;
   const [shipment, templates] = await Promise.all([
     prisma.shipment.findUnique({

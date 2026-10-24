@@ -14,6 +14,7 @@ import {
   type AnalyticsPeriod,
 } from "@/lib/analytics";
 import { Download, FileSpreadsheet } from "lucide-react";
+import { redirectUnlessAdmin } from "@/lib/auth";
 
 type PageProps = {
   searchParams: Promise<{ period?: string; trend?: string }>;
@@ -50,6 +51,7 @@ function TrendBars({
 }
 
 export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
+  await redirectUnlessAdmin();
   const sp = await searchParams;
   const period = parseAnalyticsPeriod(sp.period);
   const trendDaysRaw = sp.trend === "7" || sp.trend === "30" ? sp.trend : period === "7" ? "7" : "30";

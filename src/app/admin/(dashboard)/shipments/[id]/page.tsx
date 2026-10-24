@@ -15,7 +15,7 @@ import {
   reminderForShipment,
 } from "@/lib/shipment-links";
 import { getSoonDays } from "@/lib/reminder-config";
-import { getAdminSession, isSuperAdmin } from "@/lib/auth";
+import { getAdminSession, isSuperAdmin, redirectUnlessAdmin } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -26,6 +26,7 @@ const statusOptions = Object.entries(SHIPMENT_STATUS_LABEL).map(([value, label])
 }));
 
 export default async function ShipmentDetailPage({ params }: PageProps) {
+  await redirectUnlessAdmin();
   const { id } = await params;
   const [shipment, soonDays, activities, session] = await Promise.all([
     prisma.shipment.findUnique({
