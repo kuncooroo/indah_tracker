@@ -21,8 +21,10 @@ import { getSoonDays } from "@/lib/reminder-config";
 import { buildDailyBuckets, periodSince } from "@/lib/analytics";
 import { cn, formatDateLongId } from "@/lib/utils";
 import { AdminOnboardingGuide } from "@/components/admin/onboarding-guide";
+import { redirectUnlessAdmin } from "@/lib/auth";
 
 export default async function AdminDashboardPage() {
+  await redirectUnlessAdmin();
   const todayLabel = formatDateLongId(new Date());
   const soonDays = await getSoonDays();
   const since7 = periodSince("7")!;

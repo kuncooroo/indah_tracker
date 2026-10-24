@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SHIPMENT_STATUS_LABEL } from "@/lib/tracking";
 import { deleteShipment, purgeShipment, restoreShipment } from "@/lib/admin-actions";
 import { AdminDeleteButton } from "@/components/admin/admin-forms";
-import { getAdminSession, isSuperAdmin } from "@/lib/auth";
+import { getAdminSession, isSuperAdmin, redirectUnlessAdmin } from "@/lib/auth";
 import { ShipmentShareActions } from "@/components/admin/shipment-share-actions";
 import {
   buildTrackPath,
@@ -24,6 +24,7 @@ type PageProps = {
 };
 
 export default async function AdminShipmentsPage({ searchParams }: PageProps) {
+  await redirectUnlessAdmin();
   const sp = await searchParams;
   const filters = parseShipmentListFilters(sp);
   const soonDays = await getSoonDays();
