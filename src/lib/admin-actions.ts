@@ -12,7 +12,7 @@ import {
 } from "@/lib/activity-log";
 import { getAdminSession, requireAdmin, requireSuperAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateTrackingNumber, phoneLast4 } from "@/lib/tracking";
+import { generateTrackingNumber, phoneLast4, resolveDeliveredAt } from "@/lib/tracking";
 import { SHIPMENTS_LIST_CACHE_TAG } from "@/lib/shipment-query";
 
 function bustShipmentListCache() {
@@ -118,7 +118,7 @@ export async function updateShipment(formData: FormData): Promise<ActionResult> 
         note,
         orderNumber,
         externalOrderId,
-        deliveredAt: status === "DELIVERED" ? new Date() : null,
+        deliveredAt: resolveDeliveredAt(existing.status, status, existing.deliveredAt),
       },
     });
 

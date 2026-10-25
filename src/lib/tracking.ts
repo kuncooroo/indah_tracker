@@ -14,6 +14,22 @@ export function phoneLast4(phone: string | null | undefined): string | null {
   return digits.slice(-4);
 }
 
+/**
+ * Delivery time is the moment status becomes DELIVERED.
+ * Later edits that stay on DELIVERED must keep that timestamp.
+ * Leaving DELIVERED clears it.
+ */
+export function resolveDeliveredAt(
+  previousStatus: string,
+  nextStatus: string,
+  previousDeliveredAt: Date | null,
+  now = new Date(),
+): Date | null {
+  if (nextStatus !== "DELIVERED") return null;
+  if (previousStatus === "DELIVERED") return previousDeliveredAt ?? now;
+  return now;
+}
+
 export const SHIPMENT_STATUS_LABEL: Record<string, string> = {
   CREATED: "Dibuat",
   IN_PROGRESS: "Dalam proses",
