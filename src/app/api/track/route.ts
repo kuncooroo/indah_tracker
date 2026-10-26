@@ -5,10 +5,11 @@ import {
   clientIpFromRequest,
   rateLimit,
   rateLimitHeaders,
+  rateLimitPinned,
 } from "@/lib/rate-limit";
 import { resolveEndDate } from "@/lib/shipment-links";
 import { getSoonDays } from "@/lib/reminder-config";
-import { SHIPMENT_STATUS_LABEL } from "@/lib/tracking";
+import { publicPhoneAttemptKey, SHIPMENT_STATUS_LABEL } from "@/lib/tracking";
 import { daysUntil, getDeadlineReminder } from "@/lib/utils";
 import { getPublicActivityFeed } from "@/lib/activity-log";
 
@@ -108,7 +109,7 @@ export async function GET(request: Request) {
 
   if (shipment.phoneLast4) {
     if (!phoneLast4 || phoneLast4 !== shipment.phoneLast4) {
-      const phoneFail = rateLimit(`track:phone-fail:${ip}:${code}`, {
+      const phoneFail = rateLimitPinned(publicPhoneAttemptKey(code), {
         limit: cfg.phoneFailLimit,
         windowMs: cfg.phoneFailWindowMs,
       });

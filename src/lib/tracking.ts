@@ -1,10 +1,22 @@
-/** Generate tracking number: IM-TRK-YYYYMMDD-XXXX */
-export function generateTrackingNumber(seq = Math.floor(Math.random() * 9000) + 1000) {
+import { randomBytes } from "node:crypto";
+
+/**
+ * Public tracking id: IM-TRK-YYYYMMDD- plus 32 random bits.
+ * A 4-digit suffix is enumerable (9000 values per day). Pass `seq` only from seed data.
+ */
+export function generateTrackingNumber(seq?: number) {
   const now = new Date();
   const y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, "0");
   const d = String(now.getDate()).padStart(2, "0");
-  return `IM-TRK-${y}${m}${d}-${String(seq).padStart(4, "0")}`;
+  const suffix =
+    seq == null ? randomBytes(4).toString("hex").toUpperCase() : String(seq).padStart(4, "0");
+  return `IM-TRK-${y}${m}${d}-${suffix}`;
+}
+
+/** Phone-check bucket. Do not include client IP — X-Forwarded-For is caller-controlled. */
+export function publicPhoneAttemptKey(trackingNumber: string) {
+  return `track:phone:${trackingNumber.trim().toUpperCase()}`;
 }
 
 export function phoneLast4(phone: string | null | undefined): string | null {

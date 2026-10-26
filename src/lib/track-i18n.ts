@@ -44,7 +44,7 @@ const dict = {
     errNotFoundTitle: "Kode tracking tidak ditemukan",
     errNotFoundMsg: "Periksa ejaan nomor tracking (huruf & angka).",
     errNotFoundHint:
-      "Contoh format: IM-TRK-20260926-0001. Hubungi Indah Mesin jika Anda yakin kodenya benar.",
+      "Contoh format: IM-TRK-20260926-A1B2C3D4. Hubungi Indah Mesin jika Anda yakin kodenya benar.",
     errPhoneMismatchTitle: "Telepon tidak cocok",
     errPhoneMismatchHint:
       "Gunakan nomor yang terdaftar saat pemesanan. Bukan nomor lain di perusahaan.",
@@ -144,7 +144,7 @@ const dict = {
     errNotFoundTitle: "Tracking code not found",
     errNotFoundMsg: "Check the tracking number spelling (letters & digits).",
     errNotFoundHint:
-      "Example format: IM-TRK-20260926-0001. Contact Indah Mesin if you believe the code is correct.",
+      "Example format: IM-TRK-20260926-A1B2C3D4. Contact Indah Mesin if you believe the code is correct.",
     errPhoneMismatchTitle: "Phone digits do not match",
     errPhoneMismatchHint:
       "Use the phone number registered with the order — not another company number.",
