@@ -6,6 +6,8 @@
 type Bucket = { count: number; resetAt: number };
 
 const store = new Map<string, Bucket>();
+/** Phone-verification counters. Never shares capacity with spoofable IP keys. */
+const pinnedStore = new Map<string, Bucket>();
 
 const MAX_KEYS = 5_000;
 
@@ -29,17 +31,16 @@ export type RateLimitResult = {
   retryAfterSec: number;
 };
 
-export function rateLimit(
+function consume(
+  map: Map<string, Bucket>,
   key: string,
-  opts: { limit: number; windowMs: number }
+  opts: { limit: number; windowMs: number },
+  now: number
 ): RateLimitResult {
-  const now = Date.now();
-  prune(now);
-
-  let bucket = store.get(key);
+  let bucket = map.get(key);
   if (!bucket || now > bucket.resetAt) {
     bucket = { count: 0, resetAt: now + opts.windowMs };
-    store.set(key, bucket);
+    map.set(key, bucket);
   }
 
   bucket.count += 1;
@@ -54,6 +55,31 @@ export function rateLimit(
     resetAt: bucket.resetAt,
     retryAfterSec,
   };
+}
+
+export function rateLimit(
+  key: string,
+  opts: { limit: number; windowMs: number }
+): RateLimitResult {
+  const now = Date.now();
+  prune(now);
+  return consume(store, key, opts, now);
+}
+
+/**
+ * Limit that cannot be reset by flooding other keys.
+ * The general store drops the oldest entry once it hits MAX_KEYS, so a caller
+ * who rotates X-Forwarded-For can evict a phone-attempt counter.
+ */
+export function rateLimitPinned(
+  key: string,
+  opts: { limit: number; windowMs: number }
+): RateLimitResult {
+  const now = Date.now();
+  for (const [entry, bucket] of pinnedStore) {
+    if (now > bucket.resetAt) pinnedStore.delete(entry);
+  }
+  return consume(pinnedStore, key, opts, now);
 }
 
 export function clientIpFromRequest(request: Request): string {
