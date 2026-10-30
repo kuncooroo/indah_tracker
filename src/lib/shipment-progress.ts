@@ -1,5 +1,6 @@
 import { Prisma, type ProgressTaskStatus, type ShipmentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { resolveCompletedAt } from "@/lib/progress-timestamps";
 import {
   clampHours,
   distributeWeights,
@@ -109,6 +110,7 @@ export async function recalculateShipmentProgress(shipmentId: string) {
         parentId: true,
         status: true,
         weightPercent: true,
+        completedAt: true,
       },
     }),
     prisma.shipment.findUnique({
@@ -167,11 +169,17 @@ export async function recalculateShipmentProgress(shipmentId: string) {
       : anyStarted
         ? "IN_PROGRESS"
         : "NOT_STARTED";
+    const parent = tasks.find((task) => task.id === parentId);
     await prisma.progressTask.update({
       where: { id: parentId },
       data: {
         status: nextStatus,
-        completedAt: allDone ? new Date() : null,
+        completedAt: resolveCompletedAt(
+          nextStatus,
+          parent?.status ?? "NOT_STARTED",
+          parent?.completedAt,
+          new Date()
+        ),
         ...(!anyStarted ? { startedAt: null } : {}),
       },
     });

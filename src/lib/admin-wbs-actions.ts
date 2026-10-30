@@ -20,6 +20,7 @@ import {
   suggestShipmentStatusFromProgress,
   validateParentWeights,
 } from "@/lib/shipment-progress";
+import { resolveCompletedAt } from "@/lib/progress-timestamps";
 import { SHIPMENT_STATUS_LABEL } from "@/lib/tracking";
 import { SHIPMENTS_LIST_CACHE_TAG } from "@/lib/shipment-query";
 
@@ -274,7 +275,7 @@ export async function updateProgressTask(formData: FormData): Promise<ActionResu
           nextStatus === "IN_PROGRESS" || nextStatus === "COMPLETED"
             ? task.startedAt ?? new Date()
             : null,
-        completedAt: nextStatus === "COMPLETED" ? new Date() : null,
+        completedAt: resolveCompletedAt(nextStatus, task.status, task.completedAt, new Date()),
       },
     });
 
@@ -610,7 +611,7 @@ export async function bulkUpdateProgressTasks(formData: FormData): Promise<Actio
             statusRaw === "IN_PROGRESS" || statusRaw === "COMPLETED"
               ? task.startedAt ?? new Date()
               : null,
-          completedAt: statusRaw === "COMPLETED" ? new Date() : null,
+          completedAt: resolveCompletedAt(statusRaw, task.status, task.completedAt, new Date()),
         },
       });
 
