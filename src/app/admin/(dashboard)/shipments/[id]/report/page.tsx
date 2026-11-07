@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 import { SHIPMENT_STATUS_LABEL } from "@/lib/tracking";
 import { resolveEndDate } from "@/lib/shipment-links";
 import { formatDateId, formatDateLongId } from "@/lib/utils";
+import { hourEstimatePhrase } from "@/lib/wbs-weights";
 import { PrintReportButton } from "@/components/admin/print-report-button";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -173,6 +174,7 @@ export default async function ShipmentProgressReportPage({ params }: PageProps) 
                       <div>
                         <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-400">
                           Fase {idx + 1} · bobot {Number(parent.weightPercent)}%
+                          {parent.estimatedDays ? ` · ~${parent.estimatedDays} hari` : ""}
                         </p>
                         <p className="font-semibold text-neutral-900">{parent.title}</p>
                       </div>
@@ -193,7 +195,7 @@ export default async function ShipmentProgressReportPage({ params }: PageProps) 
                                 </p>
                                 <p className="mt-0.5 text-xs text-neutral-500">
                                   {child.estimatedHours != null
-                                    ? `Estimasi ${child.estimatedHours} jam`
+                                    ? `Estimasi ${hourEstimatePhrase(child.estimatedHours)}`
                                     : null}
                                   {child.actualHours != null
                                     ? ` · aktual ${child.actualHours} jam`

@@ -7,7 +7,14 @@ import {
   duplicateWbsTemplate,
 } from "@/lib/admin-wbs-actions";
 import { prisma } from "@/lib/prisma";
-import { distributeWeights, validateParentWeights } from "@/lib/wbs-weights";
+import {
+  distributeWeights,
+  hourEstimatePhrase,
+  phaseShopHours,
+  usesMultiDayEstimate,
+  validateParentWeights,
+  workDaysFromHours,
+} from "@/lib/wbs-weights";
 import { AdminDeleteButton } from "@/components/admin/admin-forms";
 import {
   WbsTemplateItemCreateDialog,
@@ -75,6 +82,9 @@ export default async function WbsTemplateDetailPage({ params }: PageProps) {
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
                     Fase {idx + 1} · bobot apply ~{parentWeights[idx] ?? 0}%
+                    {usesMultiDayEstimate(parent)
+                      ? ` · ${workDaysFromHours(phaseShopHours(parent))} hari kerja`
+                      : ""}
                   </p>
                   <h3 className="font-semibold text-neutral-900">{parent.title}</h3>
                 </div>
@@ -87,6 +97,7 @@ export default async function WbsTemplateDetailPage({ params }: PageProps) {
                   />
                   <WbsTemplateItemEditDialog
                     row={parent}
+                    includeHours={parent.children.length === 0}
                     updateAction={updateWbsTemplateItem}
                   />
                   <AdminDeleteButton
@@ -99,14 +110,18 @@ export default async function WbsTemplateDetailPage({ params }: PageProps) {
               </div>
               <ul className="divide-y divide-neutral-100">
                 {parent.children.length === 0 ? (
-                  <li className="px-5 py-4 text-sm text-neutral-400">Belum ada sub-tugas.</li>
+                  <li className="px-5 py-4 text-sm text-neutral-500">
+                    {parent.estimatedHours != null
+                      ? `Estimasi ${hourEstimatePhrase(parent.estimatedHours)}`
+                      : "Belum ada sub-tugas."}
+                  </li>
                 ) : (
                   parent.children.map((child) => (
                     <li key={child.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
                       <div>
                         <p className="text-sm font-medium text-neutral-800">{child.title}</p>
                         <p className="text-xs text-neutral-500">
-                          Estimasi {child.estimatedHours ?? 8} jam
+                          Estimasi {hourEstimatePhrase(child.estimatedHours)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">

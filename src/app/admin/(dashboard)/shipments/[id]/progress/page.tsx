@@ -13,6 +13,7 @@ import {
   updateProgressTask,
 } from "@/lib/admin-wbs-actions";
 import { prisma } from "@/lib/prisma";
+import { hourEstimatePhrase } from "@/lib/wbs-weights";
 import {
   suggestShipmentStatusFromProgress,
   validateParentWeights,
@@ -77,6 +78,7 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
           orderBy: { sortOrder: "asc" },
           select: {
             title: true,
+            estimatedHours: true,
             children: {
               orderBy: { sortOrder: "asc" },
               select: { title: true, estimatedHours: true },
@@ -316,8 +318,10 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
 
                 <ul className="divide-y divide-neutral-100">
                   {parent.children.length === 0 ? (
-                    <li className="px-5 py-4 text-sm text-neutral-400">
-                      Belum ada sub-tugas. Tambah sub-tugas manual, atau update status fase langsung.
+                    <li className="px-5 py-4 text-sm text-neutral-500">
+                      {parent.estimatedHours
+                        ? `Estimasi ${hourEstimatePhrase(parent.estimatedHours)} · update status fase langsung.`
+                        : "Belum ada sub-tugas. Tambah sub-tugas manual, atau update status fase langsung."}
                     </li>
                   ) : (
                     parent.children.map((child) => (
@@ -327,7 +331,7 @@ export default async function ShipmentProgressPage({ params }: PageProps) {
                             <p className="text-sm font-medium text-neutral-800">{child.title}</p>
                             <p className="mt-0.5 text-xs text-neutral-500">
                               Bobot {Number(child.weightPercent)}% · estimasi{" "}
-                              {child.estimatedHours ?? 8} jam
+                              {hourEstimatePhrase(child.estimatedHours)}
                               {child.actualHours != null
                                 ? ` · aktual ${child.actualHours} jam`
                                 : ""}

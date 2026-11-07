@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <title>Panduan Pengguna Indah Tracker</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: #222;
+      font-family: "Segoe UI", Calibri, "Helvetica Neue", Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.45;
+      background: white;
+    }
+    h1 {
+      font-size: 22pt;
+      color: #1b3a6b;
+      font-weight: 700;
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+    h2 {
+      font-size: 14pt;
+      color: #1a56b0;
+      font-weight: 700;
+      margin: 18px 0 8px;
+      padding-bottom: 3px;
+      border-bottom: 1.5px solid #1a56b0;
+      break-after: avoid;
+      line-height: 1.25;
+    }
+    h3 {
+      font-size: 12pt;
+      color: #1b3a6b;
+      font-weight: 700;
+      margin: 14px 0 6px;
+      break-after: avoid;
+    }
+    p { margin: 0 0 8px; }
+    hr {
+      border: none;
+      border-top: 1px solid #c8c8c8;
+      margin: 12px 0 4px;
+    }
+    ul, ol { margin: 4px 0 10px; padding-left: 20px; }
+    li { margin: 0 0 4px; }
+    strong { font-weight: 700; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 12px;
+      font-size: 10.5pt;
+      break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #c5cdd6;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #e7eef6;
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+    figure {
+      margin: 8px 0 12px;
+      break-inside: avoid;
+    }
+    figure img {
+      width: 100%;
+      height: auto;
+      border: 1px solid #d0d5dc;
+      display: block;
+    }
+    figure.tall img {
+      height: 92mm;
+      object-fit: cover;
+      object-position: top center;
+    }
+    figcaption {
+      margin-top: 4px;
+      font-size: 9pt;
+      color: #555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Panduan Pengguna Indah Tracker</h1>
+<p>Panduan ini untuk pelanggan, admin, dan pengelola. Isinya menjelaskan cara memakai Indah Tracker sehari-hari: masuk, membuat nomor pelacakan, mencatat progres pekerjaan, mengirim tautan ke pelanggan, melihat laporan, dan apa yang perlu dilakukan jika sesuatu tidak berjalan seperti biasa.</p>
+<p>Nama tombol dan menu di aplikasi berbahasa Inggris. Di panduan ini nama itu ditulis apa adanya, supaya mudah dicocokkan dengan layar.</p>
+<hr>
+
+<h2>1. Pengenalan</h2>
+<p>Indah Tracker adalah halaman pelacakan pesanan mesin Indah Mesin. Anda membukanya lewat peramban (browser), seperti Chrome atau Edge. Pelanggan melihat pesanan sudah sampai tahap mana. Tim kantor dan workshop mencatat progres, menambahkan foto, lalu mengirim tautan.</p>
+<p>Yang bisa dilakukan:</p>
+<ul>
+  <li>Membuat nomor pelacakan untuk tiap pesanan. Bentuknya seperti <strong>IM-TRK-20260926-0001</strong>.</li>
+  <li>Menyusun tahapan kerja yang bisa dipakai ulang, lalu menandai tiap tahap: belum, sedang dikerjakan, atau selesai.</li>
+  <li>Melampirkan foto dari workshop pada tahap yang sudah dikerjakan.</li>
+  <li>Mengirim tautan ke pelanggan lewat salin tautan atau WhatsApp.</li>
+  <li>Melihat status, persen selesai, sisa hari menuju target, dan foto, tanpa pelanggan perlu membuat akun.</li>
+  <li>Melihat ringkasan hari ini, pesanan yang telat, dan laporan beberapa periode.</li>
+  <li>Mencetak laporan satu pesanan, atau mengunduh rekap banyak pesanan.</li>
+  <li>Mengganti kata sandi, mengatur pengingat jatuh tempo, dan (untuk pengelola utama) membuat akun rekan.</li>
+</ul>
+<p>Yang <strong>tidak</strong> tersedia di versi ini:</p>
+<ul>
+  <li>Pendaftaran mandiri dari halaman masuk. Akun admin dibuat oleh pengelola.</li>
+  <li>Pelanggan tidak masuk dengan email. Mereka hanya memakai nomor tracking dan 4 digit terakhir telepon.</li>
+</ul>
+<p>Urutan kerja yang paling sering dipakai: siapkan template tahapan, buat nomor tracking, pasang template, perbarui progres, lalu kirim tautan.</p>
+
+<h2>2. Siapa memakai apa</h2>
+<p>Ada tiga pihak. Menu di kiri layar admin menyesuaikan peran Anda. Menu <strong>Admin users</strong> hanya muncul untuk pengelola utama.</p>
+<table>
+  <thead>
+    <tr><th>Peran di layar</th><th>Siapa biasanya</th><th>Yang bisa dilakukan</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Pelanggan</strong></td>
+      <td>Pemesan mesin</td>
+      <td>Membuka tautan lacak. Tidak punya akun. Melihat status, progres, tahapan, dan foto.</td>
+    </tr>
+    <tr>
+      <td><strong>ADMIN</strong></td>
+      <td>Tim kantor atau workshop</td>
+      <td>Dashboard, Workshop, Analytics, template tahapan, shipments, ganti kata sandi, dan pengingat. Tidak mengelola akun orang lain.</td>
+    </tr>
+    <tr>
+      <td><strong>SUPERADMIN</strong></td>
+      <td>Pengelola utama</td>
+      <td>Semua yang bisa dilakukan admin, plus menambah, mengubah, menonaktifkan, dan menghapus akun. Juga dapat menghapus pesanan secara permanen dari arsip.</td>
+    </tr>
+  </tbody>
+</table>
+<p>Setelah masuk, admin dan pengelola membuka <strong>Dashboard</strong>.</p>
+
+<h2>3. Masuk, keluar, dan mendapat akun</h2>
+<h3>3.1 Mendapat akun</h3>
+<p>Tidak ada tombol daftar di halaman masuk.</p>
+<ol>
+  <li>Saat aplikasi pertama kali disiapkan, dibuat satu akun pengelola. Simpan email dan kata sandinya.</li>
+  <li>Pengelola membuat akun lain lewat menu <strong>Admin users</strong>, lalu <strong>Tambah admin</strong>.</li>
+  <li>Berikan nama, email, kata sandi sementara, dan peran (<strong>ADMIN</strong> atau <strong>SUPERADMIN</strong>) kepada orang yang bersangkutan.</li>
+  <li>Minta mereka masuk, lalu segera mengganti kata sandi lewat <strong>Settings</strong>.</li>
+</ol>
+<h3>3.2 Masuk</h3>
+<ol>
+  <li>Buka alamat panel admin yang diberikan pengelola.</li>
+  <li>Jika belum masuk, Anda akan melihat halaman <strong>Admin</strong>.</li>
+  <li>Isi <strong>Email</strong> dan <strong>Password</strong>. Ikon mata di kanan kolom menampilkan atau menyembunyikan kata sandi.</li>
+  <li>Klik <strong>Masuk</strong>.</li>
+</ol>
+<p>Jika email dan kata sandi benar, Anda masuk ke <strong>Dashboard</strong>.</p>
+<figure>
+  <img src="gambar/01-halaman-masuk.png" alt="Halaman masuk admin" />
+  <figcaption>Gambar 1. Halaman masuk admin.</figcaption>
+</figure>
+<h3>3.3 Keluar</h3>
+<p>Di bagian bawah menu kiri, klik <strong>Logout</strong>. Lakukan ini jika komputer dipakai bergantian.</p>
+
+<h2>4. Mengenal layar</h2>
+<p>Layar kerja punya dua bagian:</p>
+<ul>
+  <li><strong>Kiri:</strong> menu. Menu yang sedang dibuka berwarna hitam. Nama Anda, email, dan <strong>Logout</strong> ada di bawah.</li>
+  <li><strong>Kanan:</strong> isi halaman.</li>
+</ul>
+<table>
+  <thead>
+    <tr><th>Menu</th><th>Untuk apa</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Dashboard</td><td>Ringkasan hari ini: telat, segera jatuh tempo, dan yang masih sesuai jadwal</td></tr>
+    <tr><td>Workshop</td><td>Daftar pekerjaan yang masih berjalan, untuk update cepat dari HP</td></tr>
+    <tr><td>Analytics</td><td>Angka dan grafik menurut periode</td></tr>
+    <tr><td>Template WBS</td><td>Daftar tahapan kerja yang bisa dipakai ulang. WBS di sini artinya urutan kerja</td></tr>
+    <tr><td>Shipments</td><td>Daftar nomor pelacakan, pencarian, dan buat pesanan baru</td></tr>
+    <tr><td>Settings</td><td>Ganti kata sandi dan ambang pengingat jatuh tempo</td></tr>
+    <tr><td>Admin users</td><td>Akun pegawai. Hanya pengelola utama</td></tr>
+    <tr><td>Alur kerja</td><td>Ringkasan langkah di dalam aplikasi</td></tr>
+  </tbody>
+</table>
+<figure class="tall">
+  <img src="gambar/03-dashboard.png" alt="Dashboard dan menu kiri" />
+  <figcaption>Gambar 2. Dashboard. Menu kiri tetap terlihat di setiap halaman admin. Gulir ke bawah untuk shipment terbaru.</figcaption>
+</figure>
+
+<h2>5. Pelanggan melihat progres</h2>
+<p>Pelanggan menerima tautan dari Indah Mesin, biasanya lewat WhatsApp. Mereka tidak perlu mendaftar.</p>
+<ol>
+  <li>Buka tautan, atau buka halaman <strong>Trace &amp; Track</strong>.</li>
+  <li>Isi <strong>Nomor tracking</strong> persis seperti yang dikirim.</li>
+  <li>Isi <strong>4 digit terakhir nomor telepon</strong> yang tercatat pada PO. Jika nomornya 081234567890, isi 7890.</li>
+  <li>Klik <strong>Lacak</strong>.</li>
+</ol>
+<p>Yang terlihat setelah berhasil:</p>
+<ul>
+  <li>Status pesanan dan persen selesai.</li>
+  <li>Garis status: Dibuat, Proses, QC, Siap, Kirim, Terkirim.</li>
+  <li>Sisa hari menuju target, jika target sudah diisi.</li>
+  <li>Rincian fase. Tiap fase bisa dibuka untuk melihat sub-tugas dan foto.</li>
+  <li>Tombol <strong>ID</strong> / <strong>EN</strong> di kanan atas untuk mengganti bahasa tampilan.</li>
+  <li>Tombol <strong>Bagikan</strong> dan <strong>Salin link</strong> agar halaman yang sama bisa dibuka lagi.</li>
+</ul>
+<figure class="tall">
+  <img src="gambar/17-lacak-pelanggan.png" alt="Halaman lacak pelanggan" />
+  <figcaption>Gambar 3. Halaman yang dilihat pelanggan. Empat digit telepon wajib diisi sebelum progres ditampilkan.</figcaption>
+</figure>
+<p>Empat digit diminta supaya orang yang hanya mengetahui nomor tracking tidak langsung melihat detail pesanan. Gunakan nomor yang tercatat saat pemesanan, bukan nomor rekan lain di perusahaan.</p>
+<p>Arti status di panel admin:</p>
+<table>
+  <thead>
+    <tr><th>Status</th><th>Artinya</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Dibuat</td><td>Nomor pelacakan sudah ada, pekerjaan belum berjalan</td></tr>
+    <tr><td>Dalam proses</td><td>Mesin sedang dikerjakan</td></tr>
+    <tr><td>Quality check</td><td>Pekerjaan utama selesai, sedang diperiksa</td></tr>
+    <tr><td>Siap kirim</td><td>Siap dikemas dan diberangkatkan</td></tr>
+    <tr><td>Dalam pengiriman</td><td>Sedang dalam perjalanan</td></tr>
+    <tr><td>Terkirim</td><td>Pesanan sudah sampai</td></tr>
+    <tr><td>Dibatalkan</td><td>Pesanan tidak dilanjutkan</td></tr>
+  </tbody>
+</table>
+
+<h2>6. Membuat dan mencari nomor pelacakan</h2>
+<h3>6.1 Membuat nomor baru</h3>
+<ol>
+  <li>Buka <strong>Shipments</strong>.</li>
+  <li>Klik <strong>+ Generate tracking</strong>.</li>
+  <li>Isi data pelanggan. <strong>Nomor PO</strong> dan <strong>Catatan</strong> boleh dikosongkan. <strong>Telepon</strong> sebaiknya diisi, karena 4 digit terakhirnya dipakai pelanggan.</li>
+  <li><strong>External Order ID</strong> hanya diisi jika pesanan ini terhubung dengan nomor di sistem katalog. Untuk pencatatan manual, biarkan kosong.</li>
+  <li>Klik <strong>Generate nomor tracking</strong>.</li>
+</ol>
+<p>Sistem membuat kode baru dan membuka halaman detail pesanan.</p>
+<figure>
+  <img src="gambar/05-buat-nomor-lacak.png" alt="Formulir buat nomor tracking" />
+  <figcaption>Gambar 4. Formulir pesanan baru. Tulisan di dalam kotak hanya contoh. Ganti dengan data pelanggan yang sebenarnya.</figcaption>
+</figure>
+<h3>6.2 Mencari pesanan yang sudah ada</h3>
+<ol>
+  <li>Di <strong>Shipments</strong>, isi kotak <strong>Cari</strong> dengan nomor tracking, nomor PO, nama, perusahaan, atau telepon.</li>
+  <li>Pilih <strong>Status</strong> dan <strong>Deadline</strong> jika perlu.</li>
+  <li>Klik <strong>Terapkan filter</strong>.</li>
+  <li>Klik <strong>Reset</strong> untuk kembali ke daftar penuh.</li>
+</ol>
+<p>Klik nomor tracking untuk membuka detail. Di kolom <strong>Aksi</strong> ada empat ikon: salin tautan, kirim WhatsApp, buka halaman pelanggan, dan arsipkan.</p>
+<figure>
+  <img src="gambar/04-daftar-pesanan.png" alt="Daftar shipments" />
+  <figcaption>Gambar 5. Daftar pesanan, pencarian, dan tombol buat nomor baru.</figcaption>
+</figure>
+
+<h2>7. Template tahapan</h2>
+<p>Template adalah daftar kerja yang dipakai berulang, misalnya fabrikasi, piping, kelistrikan, pengujian, lalu packing. Setelah dipasang ke satu pesanan, tiap butir ditandai satu per satu. Mengubah template tidak mengubah pesanan yang sudah berjalan.</p>
+<ol>
+  <li>Buka <strong>Template WBS</strong>.</li>
+  <li>Buat template baru: isi nama, perkiraan hari selesai, dan keterangan. Centang <strong>Aktif</strong> supaya template bisa dipilih.</li>
+  <li>Klik nama template untuk mengatur fase dan sub-tugas.</li>
+  <li>Pada tiap fase, tambah sub-tugas dan perkiraan jam. Satu butir paling lama 8 jam. Jika lebih lama, pecah menjadi beberapa butir.</li>
+  <li>Pastikan statusnya <strong>Aktif</strong> sebelum dipakai.</li>
+</ol>
+<figure>
+  <img src="gambar/12-template-tahapan.png" alt="Daftar template tahapan" />
+  <figcaption>Gambar 6. Daftar template. Status Aktif berarti siap dipasang ke pesanan.</figcaption>
+</figure>
+<p>Jumlah bobot seluruh fase harus 100%. Jika belum pas, layar progres akan memberi tahu. Bagi bobot sesuai besar pekerjaan.</p>
+
+<h2>8. Memperbarui progres</h2>
+<ol>
+  <li>Buka pesanan dari <strong>Shipments</strong>, lalu klik <strong>Update progress</strong>.</li>
+  <li>Jika belum ada tahapan, pilih template yang aktif, lalu terapkan.</li>
+  <li>Pada sub-tugas, pilih <strong>Belum</strong>, <strong>Dikerjakan</strong>, atau <strong>Selesai</strong>.</li>
+  <li>Isi jam kerja yang benar-benar terpakai, jika Anda mengetahuinya.</li>
+  <li>Lampirkan foto dan tulis keterangan singkat, lalu simpan.</li>
+</ol>
+<p>Persen di atas halaman dihitung dari bobot tahap yang selesai. Anda bisa menambah fase khusus untuk satu pesanan tanpa mengubah template aslinya.</p>
+<p><strong>Reset progress</strong> mengosongkan kemajuan pesanan itu, termasuk tanda selesai. Pakai hanya jika pemasangan template memang keliru.</p>
+<p>Status pesanan dapat mengikuti progres, misalnya menuju <strong>Quality check</strong> saat pekerjaan hampir selesai. Anda tetap bisa memilih status secara manual di halaman detail, pada kolom <strong>Status</strong>, lalu klik <strong>Simpan</strong>.</p>
+<figure class="tall">
+  <img src="gambar/07-update-progress.png" alt="Halaman update progress" />
+  <figcaption>Gambar 7. Halaman progres. Foto tampil di bawah sub-tugas yang sudah didokumentasikan. Gulir untuk fase berikutnya.</figcaption>
+</figure>
+<p>Di halaman detail, nama, perusahaan, telepon, nomor PO, dan catatan bisa diperbaiki lalu disimpan. Bagian <strong>Jejak perubahan</strong> mencatat pembaruan status, progres, foto, dan template.</p>
+
+<h2>9. Update cepat dari HP</h2>
+<p>Menu <strong>Workshop</strong> untuk lantai produksi. Daftarnya hanya pekerjaan yang masih berjalan.</p>
+<ol>
+  <li>Masuk dengan akun admin dari HP, lalu buka <strong>Workshop</strong>.</li>
+  <li>Ketuk kartu pekerjaan. Label merah berarti telat, kuning berarti segera, abu-abu berarti belum ada target.</li>
+  <li>Pada tiap tahap, ketuk <strong>Belum</strong>, <strong>Kerja</strong>, atau <strong>OK</strong>. <strong>OK</strong> berarti selesai.</li>
+  <li>Jika banyak tahap sekaligus, gunakan <strong>Tandai semua selesai</strong>.</li>
+  <li>Simpan di bagian bawah. Tulisan <strong>Tidak ada perubahan</strong> berarti belum ada yang diubah.</li>
+</ol>
+<figure>
+  <img src="gambar/09-workshop.png" alt="Daftar pekerjaan Workshop" />
+  <figcaption>Gambar 8. Daftar pekerjaan aktif. Tombol Desktop kembali ke ringkasan biasa.</figcaption>
+</figure>
+<figure>
+  <img src="gambar/10-workshop-checklist.png" alt="Checklist Belum, Kerja, dan OK" />
+  <figcaption>Gambar 9. Checklist di HP. Foto dan jam yang lebih rinci diisi lewat Update progress.</figcaption>
+</figure>
+<p>Agar lebih cepat dibuka, buka panel admin di peramban HP, lalu pilih <strong>Tambahkan ke Layar Utama</strong>. Ikon akan muncul seperti aplikasi.</p>
+
+<h2>10. Membagikan tautan dan mencetak laporan</h2>
+<p>Lakukan ini setelah nomor telepon pelanggan sudah benar.</p>
+<ol>
+  <li>Buka detail pesanan.</li>
+  <li>Di kotak <strong>Bagikan ke customer</strong>, pilih salah satu:
+    <ul>
+      <li><strong>Salin link track</strong> — tautan tersalin, tempel ke email atau pesan.</li>
+      <li><strong>Kirim WhatsApp</strong> — membuka WhatsApp dengan pesan yang sudah berisi nomor tracking. Periksa nomor tujuan sebelum mengirim.</li>
+      <li><strong>Buka public</strong> — membuka halaman yang dilihat pelanggan, untuk memastikan isinya sudah benar.</li>
+    </ul>
+  </li>
+</ol>
+<figure class="tall">
+  <img src="gambar/06-detail-pesanan.png" alt="Detail pesanan dan tombol berbagi" />
+  <figcaption>Gambar 10. Detail pesanan. Kotak Bagikan ke customer ada di bagian atas.</figcaption>
+</figure>
+<p>Tautan yang disalin biasanya sudah menyertakan 4 digit telepon, jadi pelanggan tinggal membuka. Jika mereka mengetik manual, ingatkan agar memakai 4 angka terakhir nomor yang tercatat di PO.</p>
+<p>Untuk laporan satu pesanan:</p>
+<ol>
+  <li>Dari detail, klik <strong>Laporan PDF</strong>.</li>
+  <li>Periksa identitas pesanan, progres, dan daftar tahap.</li>
+  <li>Klik cetak, atau simpan sebagai PDF dari jendela cetak peramban.</li>
+</ol>
+<p>Di <strong>Analytics</strong> juga ada tautan PDF pada tiap baris, plus <strong>Export CSV</strong> dan <strong>Excel</strong> untuk rekap banyak pesanan.</p>
+
+<h2>11. Ringkasan dan angka</h2>
+<h3>11.1 Dashboard</h3>
+<ul>
+  <li><strong>Sudah telat</strong> — target lewat, pekerjaan masih berjalan.</li>
+  <li><strong>Reminder</strong> — target tinggal beberapa hari. Bawaannya 2 hari, bisa diubah di <strong>Settings</strong>.</li>
+  <li><strong>On track</strong> — masih sesuai jadwal.</li>
+  <li><strong>Total shipment</strong>, <strong>Aktif</strong>, <strong>Terkirim</strong>, dan <strong>Template aktif</strong> — hitungan keseluruhan.</li>
+  <li><strong>Tren 7 hari</strong> — batang biru adalah pesanan baru, garis hijau adalah yang sudah terkirim.</li>
+</ul>
+<p>Klik kartu berwarna untuk membuka daftar yang sudah disaring. Jika panduan awal masih muncul di atas Dashboard, artinya template, pesanan, atau progres belum lengkap.</p>
+<h3>11.2 Analytics</h3>
+<ol>
+  <li>Buka <strong>Analytics</strong>.</li>
+  <li>Pilih periode: <strong>7 hari</strong>, <strong>30 hari</strong>, <strong>90 hari</strong>, atau <strong>Semua</strong>.</li>
+  <li>Baca kartu jumlah pesanan, tingkat selesai, rata-rata progres, dan sebaran status.</li>
+</ol>
+<p>Tabel bawah mengurutkan pesanan aktif yang paling lama, supaya tidak ada yang terlewat. Jika grafik terlihat sepi, coba periode <strong>Semua</strong>. Angka terkirim kosong berarti belum ada pesanan yang ditandai selesai pada periode itu.</p>
+<figure class="tall">
+  <img src="gambar/11-analitik.png" alt="Halaman Analytics" />
+  <figcaption>Gambar 11. Analytics. Pilih periode di kanan atas, lalu unduh rekap jika diperlukan.</figcaption>
+</figure>
+
+<h2>12. Kata sandi, pengingat, dan akun</h2>
+<h3>12.1 Mengganti kata sandi sendiri</h3>
+<ol>
+  <li>Buka <strong>Settings</strong>.</li>
+  <li>Isi <strong>Password saat ini</strong> dan <strong>Password baru</strong>. Kata sandi baru minimal 8 karakter.</li>
+  <li>Klik <strong>Ganti password</strong>.</li>
+</ol>
+<h3>12.2 Pengingat jatuh tempo</h3>
+<p>Angka <strong>soonDays</strong> menentukan kapan pesanan masuk kartu kuning di Dashboard. Isi 2 jika Anda ingin diingatkan saat target tinggal 2 hari atau kurang, lalu klik <strong>Simpan</strong>.</p>
+<p><strong>Jalankan reminder sekarang</strong> mengirim pengingat saat itu juga, jika email atau Telegram sudah disiapkan oleh pengelola. Tiap pesanan hanya diingatkan satu kali per saluran dalam satu hari. Bagian cadangan data di bawah halaman ini diurus pengelola sistem. Pengguna harian tidak perlu mengubahnya.</p>
+<h3>12.3 Mengelola akun rekan</h3>
+<p>Hanya <strong>SUPERADMIN</strong> yang melihat menu <strong>Admin users</strong>.</p>
+<ol>
+  <li>Klik <strong>Tambah admin</strong>.</li>
+  <li>Isi nama, email, kata sandi, dan peran.</li>
+  <li>Simpan, lalu beritahu email dan kata sandi sementara kepada rekan.</li>
+</ol>
+<p>Pada daftar akun, <strong>Edit</strong> mengubah data. Akun yang tidak dipakai lagi lebih baik dinonaktifkan daripada dihapus. Akun yang nonaktif tidak bisa masuk. Pesan di halaman masuk tetap “Email atau password salah.”, tidak menyatakan bahwa akun dimatikan. Jangan menghapus akun yang sedang Anda pakai.</p>
+<figure>
+  <img src="gambar/15-kelola-pengguna.png" alt="Daftar akun admin" />
+  <figcaption>Gambar 12. Daftar akun. Peran ADMIN untuk kerja harian. SUPERADMIN untuk pengelola utama.</figcaption>
+</figure>
+
+<h2>13. Mengarsipkan pesanan</h2>
+<ol>
+  <li>Di detail pesanan, klik <strong>Arsipkan</strong>, lalu konfirmasi.</li>
+  <li>Untuk melihatnya lagi, buka <strong>Shipments</strong> lalu klik <strong>Lihat arsip</strong>.</li>
+  <li>Dari arsip, pesanan bisa dipulihkan ke daftar aktif.</li>
+  <li>Pengelola utama dapat menghapus permanen. Langkah ini tidak bisa dibatalkan. Simpan laporannya lebih dulu jika masih diperlukan.</li>
+</ol>
+<p>Menu <strong>Alur kerja</strong> merangkum urutan yang sama: buat nomor, pasang template, perbarui progres, kirim tautan.</p>
+
+<h2>14. Jika ada masalah</h2>
+<h3>Tidak bisa masuk</h3>
+<p>Pesan yang muncul biasanya: <strong>Email atau password salah.</strong></p>
+<figure>
+  <img src="gambar/02-masuk-gagal.png" alt="Pesan gagal masuk" />
+  <figcaption>Gambar 13. Email atau kata sandi tidak cocok. Perbaiki isian, lalu klik Masuk lagi.</figcaption>
+</figure>
+<p>Periksa hal berikut, berurutan:</p>
+<ol>
+  <li>Email diketik lengkap, tanpa spasi di awal atau akhir.</li>
+  <li>Kata sandi memperhatikan huruf besar dan kecil.</li>
+  <li>Akun masih aktif. Jika akun dimatikan, pesan yang tampil sama dengan kata sandi yang salah. Minta pengelola mengaktifkan akun di <strong>Admin users</strong>.</li>
+  <li>Jika tetap gagal, minta pengelola mengatur ulang kata sandi lewat <strong>Edit</strong> pada akun Anda.</li>
+</ol>
+<p>Aplikasi ini tidak mengirim tautan “lupa kata sandi” ke email. Jika halaman masuk tidak terbuka sama sekali, periksa koneksi dan alamat yang dibuka, lalu muat ulang.</p>
+<h3>Menu yang dicari tidak ada</h3>
+<p>Menu <strong>Admin users</strong> hanya untuk <strong>SUPERADMIN</strong>. Jika Anda yakin perannya salah, minta pengelola mengubah peran.</p>
+<h3>Nomor tracking tidak ditemukan</h3>
+<p>Halaman pelanggan menampilkan <strong>Kode tracking tidak ditemukan</strong>. Bandingkan huruf dan angka dengan pesan dari Indah Mesin, terutama angka nol dan huruf O. Contoh bentuk yang benar: IM-TRK-20260926-0001. Jika sudah sama dan tetap gagal, hubungi Indah Mesin.</p>
+<figure>
+  <img src="gambar/19-kode-tidak-ditemukan.png" alt="Kode tracking tidak ditemukan" />
+  <figcaption>Gambar 14. Kode yang salah atau belum ada ditolak sebelum data pesanan ditampilkan.</figcaption>
+</figure>
+<h3>Telepon tidak cocok</h3>
+<p>Tulisannya: <strong>Telepon tidak cocok</strong>. Nomor tracking benar, tetapi 4 digit terakhir bukan nomor yang tersimpan. Minta admin memperbaiki telepon di detail pesanan, atau gunakan nomor yang didaftarkan saat PO dibuat.</p>
+<figure>
+  <img src="gambar/20-telepon-tidak-cocok.png" alt="Telepon tidak cocok" />
+  <figcaption>Gambar 15. Empat digit harus sama dengan akhir nomor telepon di data pesanan.</figcaption>
+</figure>
+<h3>Diminta verifikasi, atau terlalu banyak percobaan</h3>
+<ul>
+  <li>Jika pesanan ketemu tetapi progres belum tampil, isi 4 digit lalu klik <strong>Lacak</strong> lagi.</li>
+  <li>Jika muncul <strong>Terlalu banyak percobaan</strong>, tunggu beberapa menit. Jangan terus menekan <strong>Lacak</strong>.</li>
+  <li><strong>Koneksi gagal</strong> berarti perangkat belum terhubung. Coba lagi setelah sinyal stabil.</li>
+</ul>
+<h3>Data pesanan tidak muncul di admin</h3>
+<ol>
+  <li>Klik <strong>Reset</strong> di <strong>Shipments</strong>, atau buka menu itu dari awal. Saringan yang sempit membuat daftar terlihat kosong.</li>
+  <li>Cek arsip lewat <strong>Lihat arsip</strong>. Pesanan yang diarsipkan tidak ada di daftar utama.</li>
+  <li><strong>Workshop</strong> hanya menampilkan pekerjaan yang masih berjalan. Pesanan terkirim atau dibatalkan ada di <strong>Shipments</strong>, dengan saringan status.</li>
+  <li>Muat ulang halaman jika rekan baru saja menyimpan perubahan.</li>
+</ol>
+<h3>Progres tetap 0% atau foto tidak ada</h3>
+<ol>
+  <li>Pasang template lewat <strong>Update progress</strong>. Tanpa tahapan, persen tidak punya dasar hitungan.</li>
+  <li>Tandai sub-tugas menjadi <strong>Selesai</strong>, bukan hanya nama fasenya, supaya persen naik sesuai bobot.</li>
+  <li>Foto baru terlihat setelah disimpan pada sub-tugas.</li>
+  <li>Jika pelanggan tidak melihat foto baru, minta mereka memuat ulang halaman lacak.</li>
+</ol>
+<h3>WhatsApp tidak terbuka</h3>
+<p>Pastikan WhatsApp terpasang, atau izinkan peramban membuka tautannya. Anda tetap bisa klik <strong>Salin link track</strong> dan menempelkannya secara manual.</p>
+<h3>Laporan atau unduhan tidak jalan</h3>
+<p>Izinkan jendela pop-up untuk situs ini, lalu coba cetak lagi. Untuk <strong>Excel</strong> atau <strong>CSV</strong>, periksa folder Unduhan pada komputer.</p>
+<h3>Ada pesanan “tanpa target”</h3>
+<p>Perkiraan hari pada template belum terpasang, atau pesanan belum punya tanggal selesai. Pasang template supaya kartu Dashboard bisa menghitung sisa hari.</p>
+
+<h2>15. Pertanyaan yang sering diajukan</h2>
+<p><strong>Apakah pelanggan harus mendaftar?</strong><br>Tidak. Pelanggan hanya membuka tautan, atau mengisi nomor tracking beserta 4 digit terakhir telepon.</p>
+<p><strong>Apa bedanya nomor tracking dan nomor PO?</strong><br>Nomor PO adalah nomor pesanan dari pelanggan atau dari penjualan. Nomor tracking dibuat oleh Indah Tracker, selalu diawali IM-TRK-, dan inilah yang diketik di halaman lacak.</p>
+<p><strong>Mengapa hanya 4 digit, bukan nomor lengkap?</strong><br>Empat digit cukup untuk memastikan yang membuka adalah pihak yang tahu nomor terdaftar, tanpa menampilkan nomor telepon utuh di halaman publik.</p>
+<p><strong>Bisakah bahasa halaman pelanggan diganti?</strong><br>Bisa. Tombol <strong>ID</strong> dan <strong>EN</strong> ada di kanan atas halaman Trace &amp; Track. Pilihan itu hanya mengubah bahasa tampilan.</p>
+<p><strong>Dari mana angka persen berasal?</strong><br>Dari bobot tiap fase pada template. Jika sebuah fase berbobot 20% dan separuh sub-tugasnya selesai, bagian itu menyumbang sekitar setengah dari 20%. Semua fase yang selesai membawa progres ke 100%.</p>
+<p><strong>Apakah mengubah template ikut mengubah pesanan yang sudah berjalan?</strong><br>Tidak. Perubahan template berlaku untuk pemasangan berikutnya. Tahap pesanan yang sudah berjalan diubah di <strong>Update progress</strong>.</p>
+<p><strong>Bisa mengerjakan dari HP?</strong><br>Bisa. Masuk sebagai admin, buka <strong>Workshop</strong>, lalu tandai <strong>Belum</strong>, <strong>Kerja</strong>, atau <strong>OK</strong>. Untuk foto, buka <strong>Update progress</strong>.</p>
+<p><strong>Siapa yang melihat data pelanggan?</strong><br>Tim yang punya akun admin. Orang lain tidak bisa membuka pesanan tanpa nomor tracking dan 4 digit telepon yang cocok.</p>
+<p><strong>Apa yang terjadi jika pesanan diarsipkan?</strong><br>Pesanan hilang dari daftar harian, tetapi masih bisa dibuka lewat <strong>Lihat arsip</strong> dan dipulihkan. Hapus permanen hanya dilakukan pengelola utama.</p>
+<p><strong>Bagaimana cara mendapat salinan untuk rapat?</strong><br>Buka <strong>Laporan PDF</strong> pada pesanan itu, lalu simpan atau cetak. Untuk banyak pesanan sekaligus, gunakan <strong>Export CSV</strong> atau <strong>Excel</strong> di <strong>Analytics</strong>.</p>
+<p><strong>Saya lupa kata sandi. Apa yang harus dilakukan?</strong><br>Hubungi pengelola utama. Ia mengatur kata sandi baru dari <strong>Admin users</strong>. Tidak ada tombol lupa kata sandi di halaman masuk.</p>
+<p><strong>Kapan kartu kuning reminder muncul?</strong><br>Saat sisa hari menuju target sama atau lebih kecil dari angka di <strong>Settings</strong>. Jika angkanya 2, pesanan yang jatuh tempo lusa sudah masuk pengingat.</p>
+<p><strong>Mengapa saya tidak melihat Admin users?</strong><br>Menu itu hanya untuk peran <strong>SUPERADMIN</strong>.</p>
+
+</body>
+</html>

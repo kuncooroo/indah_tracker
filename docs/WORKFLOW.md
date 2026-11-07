@@ -73,3 +73,26 @@ Lihat juga banner **First-run guide** di Dashboard jika data masih kosong.
 - Health: `GET /api/health` (uptime)
 - Error: set `SENTRY_DSN` (opsional)
 - Backup: `npm run db:backup`
+
+## CI/CD
+
+Push ke `main` menjalankan build di GitHub, lalu deploy ke VPS lewat SSH (`scripts/deploy.sh`). Pull request hanya di-build, tidak di-deploy.
+
+Deploy menyelaraskan kode ke `origin/main`, menjalankan `npm ci`, `prisma generate`, dan `npm run build`, lalu me-restart systemd. File `.env`, `public/uploads`, dan backup tidak diubah. Migrasi database tidak dijalankan.
+
+Secret repository di GitHub (Settings → Secrets and variables → Actions):
+
+| Secret | Isi |
+|---|---|
+| `VPS_HOST` | IP atau hostname VPS |
+| `VPS_USER` | User SSH yang memiliki folder aplikasi |
+| `VPS_SSH_KEY` | Private key SSH user tersebut |
+| `VPS_APP_DIR` | Path absolut aplikasi, misalnya `/var/www/indah_tracker` |
+| `VPS_SERVICE` | Nama unit systemd, misalnya `indah-tracker` |
+| `VPS_PORT` | Port SSH, opsional (default 22) |
+
+User deploy harus bisa `systemctl` tanpa password, misalnya:
+
+```
+deploy ALL=(root) NOPASSWD: /usr/bin/systemctl
+```

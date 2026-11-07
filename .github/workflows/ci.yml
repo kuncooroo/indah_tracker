@@ -1,5 +1,4 @@
-
-name: Indah Tracker CI
+﻿name: Indah Tracker CI
 
 on:
   push:
@@ -13,6 +12,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: "mysql://ci_user:ci_password@127.0.0.1:3306/indah_tracker_ci"
+      NEXTAUTH_SECRET: "ci-only-placeholder-secret-for-build"
+      AUTH_SECRET: "ci-only-placeholder-secret-for-build"
+      NEXTAUTH_URL: "http://localhost:3001"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3001"
 
     steps:
       - name: Checkout repository
@@ -32,7 +38,3 @@ jobs:
 
       - name: Build Next.js
         run: npm run build
-        env:
-          DATABASE_URL: "mysql://ci_user:ci_password@127.0.0.1:3306/indah_tracker_ci"
-          NEXTAUTH_SECRET: "ci-only-placeholder-secret-for-build"
-          AUTH_SECRET: "ci-only-placeholder-secret-for-build"

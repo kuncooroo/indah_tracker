@@ -11,7 +11,7 @@ import {
   adminFormGridClass,
 } from "@/components/admin/admin-forms";
 import type { ActionResult } from "@/lib/action-result";
-import { previewTemplateWeights } from "@/lib/wbs-weights";
+import { hourEstimatePhrase, MAX_SUB_HOURS, previewTemplateWeights } from "@/lib/wbs-weights";
 
 export function WbsTemplateCreateDialog({
   createAction,
@@ -96,12 +96,12 @@ export function WbsTemplateItemCreateDialog({
         <AdminFormField label="Urutan" name="sortOrder" type="number" defaultValue="0" />
         {isChild ? (
           <AdminFormField
-            label="Estimasi jam (maks 8)"
+            label={`Estimasi jam (maks ${MAX_SUB_HOURS})`}
             name="estimatedHours"
             type="number"
             defaultValue="8"
             min={1}
-            max={8}
+            max={MAX_SUB_HOURS}
             required
           />
         ) : null}
@@ -114,6 +114,7 @@ export function WbsTemplateItemCreateDialog({
 export function WbsTemplateItemEditDialog({
   row,
   updateAction,
+  includeHours,
 }: {
   row: {
     id: string;
@@ -122,22 +123,25 @@ export function WbsTemplateItemEditDialog({
     estimatedHours: number | null;
     parentId: string | null;
   };
+  /** Fase tanpa sub-tugas (mis. Kalibrasi) menyimpan jam di parent. */
+  includeHours?: boolean;
   updateAction: (formData: FormData) => Promise<ActionResult | void>;
 }) {
+  const showHours = includeHours ?? Boolean(row.parentId);
   return (
     <AdminCrudDialog title="Edit item" triggerLabel="Edit" variant="ghost" triggerMode="icon-edit">
       <AdminActionForm action={updateAction} className={adminFormGridClass} resetOnSuccess={false}>
         <input type="hidden" name="id" value={row.id} />
         <AdminFormField label="Judul" name="title" defaultValue={row.title} required />
         <AdminFormField label="Urutan" name="sortOrder" type="number" defaultValue={String(row.sortOrder)} />
-        {row.parentId ? (
+        {showHours ? (
           <AdminFormField
-            label="Estimasi jam (maks 8)"
+            label={`Estimasi jam (maks ${MAX_SUB_HOURS})`}
             name="estimatedHours"
             type="number"
             defaultValue={String(row.estimatedHours ?? 8)}
             min={1}
-            max={8}
+            max={MAX_SUB_HOURS}
           />
         ) : null}
         <AdminSubmitButton label="Update" />
@@ -193,12 +197,12 @@ export function ProgressTaskUpdateDialog({
             {isChild ? (
               <>
                 <AdminFormField
-                  label="Jam kerja aktual (maks 8)"
+                  label={`Jam kerja aktual (maks ${MAX_SUB_HOURS})`}
                   name="actualHours"
                   type="number"
                   defaultValue={row.actualHours != null ? String(row.actualHours) : ""}
                   min={1}
-                  max={8}
+                  max={MAX_SUB_HOURS}
                 />
                 <AdminFileField label="Foto dokumentasi (opsional)" name="photoUrl" />
                 <AdminFormField label="Caption foto" name="photoCaption" />
@@ -229,6 +233,7 @@ export function ApplyWbsTemplateDialog({
     estimatedDays: number;
     items: {
       title: string;
+      estimatedHours?: number | null;
       children: { title: string; estimatedHours: number | null }[];
     }[];
   }[];
@@ -284,12 +289,16 @@ export function ApplyWbsTemplateDialog({
                       <ul className="mt-1 space-y-0.5 border-l border-neutral-200 pl-3 text-xs text-neutral-600">
                         {p.children.map((c, j) => (
                           <li key={`${c.title}-${j}`}>
-                            {c.title} · {c.weightPercent}% · ~{c.estimatedHours ?? 8} jam
+                            {c.title} · {c.weightPercent}% · ~{hourEstimatePhrase(c.estimatedHours)}
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="mt-0.5 text-xs text-neutral-400">Tanpa sub-tugas (fase leaf)</p>
+                      <p className="mt-0.5 text-xs text-neutral-500">
+                        {selected.items[i]?.estimatedHours
+                          ? `Estimasi ${hourEstimatePhrase(selected.items[i]?.estimatedHours)}`
+                          : "Tanpa sub-tugas (fase leaf)"}
+                      </p>
                     )}
                   </li>
                 ))}
@@ -299,7 +308,7 @@ export function ApplyWbsTemplateDialog({
         ) : null}
 
         <p className="md:col-span-2 text-xs text-neutral-500">
-          Bobot parent/child dihitung merata otomatis. Sub-tugas memakai jam (maks 8).
+          Bobot parent/child dihitung merata otomatis. Sub-tugas memakai jam (maks {MAX_SUB_HOURS}).
         </p>
         <AdminSubmitButton label="Terapkan" />
       </AdminActionForm>
@@ -362,12 +371,12 @@ export function ManualProgressChildDialog({
           placeholder="Cover boiler"
         />
         <AdminFormField
-          label="Estimasi jam (maks 8)"
+          label={`Estimasi jam (maks ${MAX_SUB_HOURS})`}
           name="estimatedHours"
           type="number"
           defaultValue="8"
           min={1}
-          max={8}
+          max={MAX_SUB_HOURS}
           required
         />
         <AdminFormField label="Urutan (opsional)" name="sortOrder" type="number" placeholder="Otomatis" />

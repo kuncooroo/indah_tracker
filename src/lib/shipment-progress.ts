@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   clampHours,
   distributeWeights,
+  phaseDurationDays,
   round2,
 } from "@/lib/wbs-weights";
 
@@ -268,7 +269,9 @@ export async function applyWbsTemplateToShipment(shipmentId: string, templateId:
           title: parentItem.title,
           sortOrder: parentItem.sortOrder,
           weightPercent: parentWeights[i] ?? 0,
-          estimatedDays: daysPerParent,
+          estimatedDays: phaseDurationDays(parentItem, daysPerParent),
+          estimatedHours:
+            parentItem.children.length === 0 ? clampHours(parentItem.estimatedHours) : null,
           status: "NOT_STARTED",
         },
       });

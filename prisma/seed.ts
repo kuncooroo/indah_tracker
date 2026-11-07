@@ -5,6 +5,7 @@ import path from "path";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "@prisma/client";
 import { generateTrackingNumber, phoneLast4 } from "../src/lib/tracking";
+import { upsertOfficialWbsTemplate } from "../src/lib/official-wbs-template";
 import {
   applyWbsTemplateToShipment,
   recalculateShipmentProgress,
@@ -165,6 +166,9 @@ async function main() {
     }
   }
   console.log(`Template WBS: ${template.name}`);
+
+  const official = await upsertOfficialWbsTemplate(prisma);
+  console.log(`Template WBS resmi CV Indah Mesin: ${official}`);
 
   const phone = "081234567890";
   const trackingNumber = generateTrackingNumber(1);

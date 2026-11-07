@@ -148,12 +148,11 @@ export async function updateWbsTemplateItem(formData: FormData): Promise<ActionR
     const existing = await prisma.wbsTemplateItem.findUnique({ where: { id } });
     if (!existing) return fail("Item tidak ditemukan.");
     const sortRaw = parseInt(String(formData.get("sortOrder") ?? String(existing.sortOrder)), 10);
+    const hoursRaw = formData.get("estimatedHours");
     let estimatedHours = existing.estimatedHours;
-    if (existing.parentId) {
-      const hours = parseInt(String(formData.get("estimatedHours") ?? "8"), 10);
+    if (existing.parentId || hoursRaw != null) {
+      const hours = parseInt(String(hoursRaw ?? "8"), 10);
       estimatedHours = clampHours(Number.isFinite(hours) ? hours : 8);
-    } else {
-      estimatedHours = null;
     }
     await prisma.wbsTemplateItem.update({
       where: { id },
